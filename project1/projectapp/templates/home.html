@@ -1,0 +1,122 @@
+{% extends 'base2.html' %}
+
+{% block title %}
+  APP
+{% endblock title %}
+{% block body %}
+
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="text-center">
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+   
+            <button  id="markAttendance" class="btn btn-primary">Mark attendance</button>
+
+
+
+
+            <button id="markLeave"  class="btn btn-primary">Mark Leave</button>
+          
+
+
+            <a href="{% url 'viewAttendance'%}">
+
+              <button id="viewAttendance"  class="btn btn-primary">View attendance</button>
+            </a>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <h2>
+      your grade soo far is {{grade}}
+    </h2>
+  </div>
+
+<script>
+
+  const attendanceBtn = document.getElementById("markAttendance")
+  const leaveBtn = document.getElementById("markLeave")
+
+
+  const markAttendanceEndpoint = "{% url 'markAttendance' %}";
+  const leaveEndpoint = "{% url 'markLeave' %}";
+
+  
+  attendanceBtn.addEventListener('click', markAttendance);
+  leaveBtn.addEventListener('click', markleave);
+  
+  
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  
+
+  async function markAttendance() {
+  try {
+    console.log("function called")
+    const response = await fetch(markAttendanceEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+    
+    });
+
+    const responseData = await response.text();
+    showAlert(responseData)
+
+  containerDiv.appendChild(alertDiv);
+  document.body.appendChild(containerDiv);
+  console.log(responseData); // Handle the response data as needed
+} catch (error) {
+    console.error(error);
+  }
+}
+
+
+async function markleave() {
+  try {
+    console.log("function called")
+    const response = await fetch(leaveEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+
+    });
+
+    const responseData = await response.text();
+    showAlert(responseData)
+    console.log(responseData); // Handle the response data as needed
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+
+
+function showAlert(message) {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+  alertDiv.setAttribute('role', 'alert');
+  alertDiv.innerHTML = `
+    ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
+
+  alertDiv.addEventListener('closed.bs.alert', () => {
+    alertDiv.remove(); // Remove the alert element from the DOM
+  });
+
+  const containerDiv = document.querySelector('.container');
+  containerDiv.appendChild(alertDiv);
+}
+
+
+</script>
+  {% endblock body %}
